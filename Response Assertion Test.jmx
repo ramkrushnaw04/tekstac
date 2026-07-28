@@ -60,7 +60,7 @@
           </ResponseAssertion>
           <hashTree/>
 
-          <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report 1" enabled="true">
+          <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="Aggregate Report 1" enabled="true">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -147,7 +147,7 @@
           </ResponseAssertion>
           <hashTree/>
 
-          <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report 2" enabled="true">
+          <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="Aggregate Report 2" enabled="true">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
