@@ -1,4 +1,6 @@
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -44,15 +46,10 @@ class HotelStayTest {
         assertEquals(0.0, HotelStay.calculateStayCost("Penthouse", 2));
     }
 
-    @Test
+    @ParameterizedTest
     @Order(6)
-    void testZeroNights() {
-        assertEquals(0.0, HotelStay.calculateStayCost("Standard", 0));
-    }
-
-    @Test
-    @Order(7)
-    void testNegativeNights() {
-        assertEquals(0.0, HotelStay.calculateStayCost("Deluxe", -5));
+    @ValueSource(ints = {0, -5})
+    void testInvalidNightCounts(int nights) {
+        assertEquals(0.0, HotelStay.calculateStayCost("Deluxe", nights));
     }
 }
