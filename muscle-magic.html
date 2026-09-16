@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Muscle Magic</title>
+<style>
+  body { background: #f5e6cc; font-family: 'Times New Roman', serif; }
+  .container { max-width: 900px; margin: 20px auto; }
+  h1 { text-align: center; background: #cdeecb; padding: 10px; margin: 0; }
+  .box { background: #cdeecb; border: 2px solid #333366; padding: 15px; margin-top: 15px; }
+  .box label { display: inline-block; width: 150px; font-weight: bold; }
+  .box input { width: 250px; padding: 3px; margin-bottom: 8px; }
+  button { background: #f5e6cc; border: 1px solid #333; color: #800000; font-weight: bold; padding: 5px 15px; margin-right: 10px; cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 5px 10px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Muscle Magic</h1>
+
+  <div class="box">
+    <div><label for="name">Name</label><input type="text" id="name"></div>
+    <div><label for="email">Email</label><input type="email" id="email"></div>
+    <div><label for="age">Age</label><input type="number" id="age"></div>
+    <div><label for="height">Height (in cm)</label><input type="number" id="height"></div>
+    <div><label for="weight">Weight (in kg)</label><input type="number" id="weight"></div>
+    <br>
+    <button id="submitBtn">Submit</button>
+    <button id="clearBtn">Clear</button>
+  </div>
+
+  <div class="box">
+    <table id="customerTable">
+      <thead>
+        <tr><th>Name</th><th>Age</th><th>Height</th><th>Weight</th></tr>
+      </thead>
+      <tbody id="tableBody">
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  // Global array to store customer objects
+  const customers = [];
+
+  const nameInput = document.getElementById('name');
+  const emailInput = document.getElementById('email');
+  const ageInput = document.getElementById('age');
+  const heightInput = document.getElementById('height');
+  const weightInput = document.getElementById('weight');
+  const tableBody = document.getElementById('tableBody');
+
+  function renderTable() {
+    tableBody.innerHTML = '';
+    customers.forEach(customer => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><strong>${customer.name}</strong></td>
+        <td>${customer.age}</td>
+        <td>${customer.height}</td>
+        <td>${customer.weight}</td>
+      `;
+      tableBody.appendChild(row);
+    });
+  }
+
+  function clearInputs() {
+    nameInput.value = '';
+    emailInput.value = '';
+    ageInput.value = '';
+    heightInput.value = '';
+    weightInput.value = '';
+  }
+
+  document.getElementById('submitBtn').addEventListener('click', () => {
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const age = ageInput.value.trim();
+    const height = heightInput.value.trim();
+    const weight = weightInput.value.trim();
+
+    if (!name || !email || !age || !height || !weight) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    const customer = { name, email, age, height, weight };
+    customers.push(customer);
+    renderTable();
+    clearInputs();
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', clearInputs);
+</script>
+</body>
+</html>
