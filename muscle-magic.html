@@ -4,15 +4,7 @@
 <meta charset="UTF-8">
 <title>Muscle Magic</title>
 <style>
-  body { background: #f5e6cc; font-family: 'Times New Roman', serif; }
-  .container { max-width: 900px; margin: 20px auto; }
-  h1 { text-align: center; background: #cdeecb; padding: 10px; margin: 0; }
-  .box { background: #cdeecb; border: 2px solid #333366; padding: 15px; margin-top: 15px; }
-  .box label { display: inline-block; width: 150px; font-weight: bold; }
-  .box input { width: 250px; padding: 3px; margin-bottom: 8px; }
-  button { background: #f5e6cc; border: 1px solid #333; color: #800000; font-weight: bold; padding: 5px 15px; margin-right: 10px; cursor: pointer; }
-  table { width: 100%; border-collapse: collapse; }
-  th, td { text-align: left; padding: 5px 10px; }
+  
 </style>
 </head>
 <body>
@@ -33,7 +25,7 @@
   <div class="box">
     <table id="customerTable">
       <thead>
-        <tr><th>Name</th><th>Age</th><th>Height</th><th>Weight</th></tr>
+        <tr><th>Name</th><th>Email</th><th>Age</th><th>Height</th><th>Weight</th></tr>
       </thead>
       <tbody id="tableBody">
       </tbody>
@@ -42,7 +34,6 @@
 </div>
 
 <script>
-  // Global array to store customer objects
   const customers = [];
 
   const nameInput = document.getElementById('name');
@@ -58,6 +49,7 @@
       const row = document.createElement('tr');
       row.innerHTML = `
         <td><strong>${customer.name}</strong></td>
+        <td>${customer.email}</td>
         <td>${customer.age}</td>
         <td>${customer.height}</td>
         <td>${customer.weight}</td>
