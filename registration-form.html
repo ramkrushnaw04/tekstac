@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Registration Form</title>
+</head>
+<body>
+
+<form id="regForm" novalidate>
+  <input type="text" id="name" placeholder="Name">
+  <div id="nameError"></div>
+
+  <input type="text" id="email" placeholder="Email">
+  <div id="emailError"></div>
+
+  <input type="password" id="password" placeholder="Password">
+  <div id="passwordError"></div>
+
+  <input type="password" id="confirmPassword" placeholder="Confirm Password">
+  <div id="confirmPasswordError"></div>
+
+  <div id="successMsg"></div>
+
+  <button type="submit">Submit</button>
+</form>
+
+<script>
+  var form = document.getElementById("regForm");
+  var successMsg = document.getElementById("successMsg");
+  var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function showError(fieldId, message) {
+    document.getElementById(fieldId + "Error").textContent = message;
+    return message === "";
+  }
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    successMsg.textContent = "";
+
+    var name = document.getElementById("name").value.trim();
+    var email = document.getElementById("email").value.trim();
+    var password = document.getElementById("password").value;
+    var confirmPassword = document.getElementById("confirmPassword").value;
+
+    var nameOk = showError("name", name === "" ? "Name is required." : "");
+
+    var emailOk = showError(
+      "email",
+      email === "" ? "Email is required."
+        : !emailPattern.test(email) ? "Please enter a valid email address."
+        : ""
+    );
+
+    var passwordOk = showError(
+      "password",
+      password === "" ? "Password is required."
+        : password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)
+        ? "Password must be at least 8 characters and include an uppercase letter and a number."
+        : ""
+    );
+
+    var confirmOk = showError(
+      "confirmPassword",
+      confirmPassword === "" ? "Please confirm your password."
+        : confirmPassword !== password ? "Passwords do not match."
+        : ""
+    );
+
+    if (nameOk && emailOk && passwordOk && confirmOk) {
+      successMsg.textContent = "Registration successful!";
+      form.reset();
+    }
+  });
+</script>
+
+</body>
+</html>
