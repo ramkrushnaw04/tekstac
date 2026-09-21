@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Revised Card Limit Check</title>
+<style>
+  body {
+    background-color: #7FFFD4;
+    font-family: "Times New Roman", serif;
+    margin: 0;
+    padding: 10px;
+  }
+  h2 {
+    text-align: center;
+    text-decoration: underline;
+    color: #003366;
+  }
+  #apiBtn, #submitBtn {
+    background-color: #C9A0DC;
+    border: 1px solid #555;
+    padding: 3px 10px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  #submitBtn {
+    display: block;
+    margin: 10px 0;
+  }
+  .msg-success {
+    color: red;
+    font-weight: bold;
+  }
+  .msg-report {
+    color: purple;
+    font-weight: bold;
+  }
+  table {
+    border-collapse: collapse;
+    background-color: #7FFFD4;
+  }
+  table, th, td {
+    border: 1px solid #333;
+  }
+  th, td {
+    padding: 3px 8px;
+    text-align: left;
+  }
+</style>
+</head>
+<body>
+
+<h2>Revised Card Limit Check</h2>
+
+<p>To get data from API <button id="apiBtn" onclick="getData()">Click Here</button></p>
+<p id="dataMsg"></p>
+
+<button id="submitBtn" onclick="renderTable()">Submit</button>
+
+<div id="tableContainer"></div>
+<p id="reportMsg"></p>
+
+<script>
+  var API_URL = "https://webapps.tekstac.com/WebAPI/CreditCardsXMLServlet";
+  var cardList = []; // collection of parsed card objects
+
+  function getData() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", API_URL, true);
+
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        parseXML(xhr.responseXML);
+      }
+    };
+
+    xhr.send();
+  }
+
+  function getTagValue(node, tagNames) {
+    // tries a list of possible tag name variants and returns the first match found
+    for (var i = 0; i < tagNames.length; i++) {
+      var el = node.getElementsByTagName(tagNames[i])[0];
+      if (el && el.textContent) {
+        return el.textContent.trim();
+      }
+    }
+    return "";
+  }
+
+  function parseXML(xml) {
+    cardList = [];
+
+    // adjust the root/record tag name below to match the actual XML if different
+    var records = xml.getElementsByTagName("CreditCard");
+    if (records.length === 0) {
+      records = xml.getElementsByTagName("Card");
+    }
+
+    for (var i = 0; i < records.length; i++) {
+      var record = records[i];
+
+      var card = {
+        cardHolderName: getTagValue(record, ["CardHolderName", "CardHolder", "Name"]),
+        cardType: getTagValue(record, ["CardType", "Type"]),
+        cardLimit: getTagValue(record, ["CardLimit", "Limit"]),
+        expiryDate: getTagValue(record, ["ExpiryDate", "Expiry"])
+      };
+
+      cardList.push(card);
+    }
+
+    if (cardList.length === 16) {
+      document.getElementById("dataMsg").innerHTML =
+        '<span class="msg-success">Data retrieved successfully.</span>';
+    } else {
+      document.getElementById("dataMsg").innerHTML =
+        '<span class="msg-success">Data retrieved successfully.</span> (' + cardList.length + ' entries found)';
+    }
+  }
+
+  function renderTable() {
+    if (cardList.length === 0) {
+      alert("Please click 'Click Here' to fetch the data first.");
+      return;
+    }
+
+    var html = "<table>";
+    html += "<tr><th>Card Holder Name</th><th>Card Type</th><th>CardLimit</th><th>Expiry Date</th></tr>";
+
+    for (var i = 0; i < cardList.length; i++) {
+      var c = cardList[i];
+      html += "<tr>";
+      html += "<td>" + c.cardHolderName + "</td>";
+      html += "<td>" + c.cardType + "</td>";
+      html += "<td>" + c.cardLimit + "</td>";
+      html += "<td>" + c.expiryDate + "</td>";
+      html += "</tr>";
+    }
+
+    html += "</table>";
+
+    document.getElementById("tableContainer").innerHTML = html;
+    document.getElementById("reportMsg").innerHTML =
+      '<span class="msg-report">Report generated successfully!!!</span>';
+  }
+</script>
+
+</body>
+</html>
