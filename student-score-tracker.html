@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Score Tracker</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg, #f2c94c, #f2994a);
+  }
+
+  .card {
+    width: 100%;
+    max-width: 480px;
+    padding: 40px 30px;
+    text-align: center;
+  }
+
+  h1 {
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    font-size: 1.7em;
+    margin-bottom: 25px;
+  }
+
+  .input-row {
+    background: #fff;
+    border-radius: 16px;
+    padding: 12px;
+    display: flex;
+    gap: 10px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    margin-bottom: 20px;
+  }
+
+  .input-row input {
+    flex: 1;
+    border: none;
+    background: #f0f0f0;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 1em;
+    outline: none;
+  }
+
+  .input-row button {
+    background: #6fbf5c;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0 22px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .input-row button:hover {
+    background: #5aa848;
+  }
+
+  #errorMsg {
+    color: #d32f2f;
+    font-weight: bold;
+    min-height: 22px;
+    margin-bottom: 15px;
+  }
+
+  #scoreList {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 25px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  #scoreList li {
+    background: rgba(255, 240, 220, 0.85);
+    border-radius: 14px;
+    padding: 14px 20px;
+    text-align: left;
+    font-size: 1.05em;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  #averageMsg {
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    font-weight: bold;
+    font-size: 1.15em;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>&#127891; Student Score Tracker</h1>
+
+  <form id="scoreForm">
+    <div class="input-row">
+      <input type="text" id="nameInput" placeholder="Student Name">
+      <input type="text" id="scoreInput" placeholder="Score">
+      <button type="submit">Add</button>
+    </div>
+  </form>
+
+  <p id="errorMsg"></p>
+
+  <ul id="scoreList"></ul>
+
+  <p id="averageMsg">Average Score: 0</p>
+</div>
+
+<script>
+  var students = []; // array of { name, score }
+
+  var form = document.getElementById("scoreForm");
+  var nameInput = document.getElementById("nameInput");
+  var scoreInput = document.getElementById("scoreInput");
+  var errorMsg = document.getElementById("errorMsg");
+  var scoreList = document.getElementById("scoreList");
+  var averageMsg = document.getElementById("averageMsg");
+
+  form.addEventListener("submit", handleSubmit);
+
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    var name = nameInput.value.trim();
+    var rawScore = scoreInput.value.trim();
+
+    errorMsg.textContent = "";
+
+    if (name === "" || rawScore === "") {
+      errorMsg.textContent = "Both fields are required";
+      return;
+    }
+
+    var score = Number(rawScore);
+
+    if (isNaN(score)) {
+      errorMsg.textContent = "Score must be a valid number";
+      return;
+    }
+
+    if (score < 0) {
+      errorMsg.textContent = "Score cannot be negative";
+      return;
+    }
+
+    students.push({ name: name, score: score });
+
+    nameInput.value = "";
+    scoreInput.value = "";
+
+    renderList();
+    updateAverage();
+  }
+
+  function renderList() {
+    scoreList.innerHTML = "";
+
+    for (var i = 0; i < students.length; i++) {
+      var li = document.createElement("li");
+      li.textContent = students[i].name + " - " + students[i].score;
+      li.setAttribute("data-index", i);
+      li.addEventListener("dblclick", handleRemove);
+      scoreList.appendChild(li);
+    }
+  }
+
+  function handleRemove(event) {
+    var index = Number(event.currentTarget.getAttribute("data-index"));
+    students.splice(index, 1);
+    renderList();
+    updateAverage();
+  }
+
+  function updateAverage() {
+    if (students.length === 0) {
+      averageMsg.textContent = "Average Score: 0";
+      return;
+    }
+
+    var total = 0;
+    for (var i = 0; i < students.length; i++) {
+      total += students[i].score;
+    }
+
+    var avg = total / students.length;
+    averageMsg.textContent =
+      "Average Score of " + students.length + " Students: " + avg.toFixed(2);
+  }
+</script>
+
+</body>
+</html>
