@@ -1,61 +1,71 @@
-
 require("dotenv").config();
+
 const express = require("express");
-const session = require("express-session");
-const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const jwt = require("jsonwebtoken");
 
 const app = express();
+app.use(express.json());
 
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false
-}));
+const PORT = 3000;
+const JWT_SECRET = process.env.JWT_SECRET;
 
-app.use(passport.initialize());
-app.use(passport.session());
+const movies = [
+  { id: 1, title: "Interstellar" },
+  { id: 2, title: "The Dark Knight" },
+  { id: 3, title: "Inception" }
+];
 
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google/callback"
-}, (accessToken, refreshToken, profile, done) => {
-  done(null, profile);
-}));
+// Login API
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
 
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((user, done) => done(null, user));
+  if (username !== "admin" || password !== "password123") {
+    return res.status(401).json({
+      message: "Invalid credentials"
+    });
+  }
 
-app.get("/", (req, res) => {
-  res.send('<a href="/auth/google">Login with Google</a>');
-});
+  const token = jwt.sign(
+    { username },
+    JWT_SECRET,
+    { expiresIn: "1h" }
+  );
 
-app.get("/auth/google",
-  passport.authenticate("google", { scope: ["profile"] })
-);
-
-app.get("/auth/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: "/failure"
-  }),
-  (req, res) => res.redirect("/dashboard")
-);
-
-app.get("/dashboard", (req, res) => {
-  if (!req.isAuthenticated()) return res.redirect("/");
-  res.send(`Welcome, ${req.user.displayName}! <a href="/logout">Logout</a>`);
-});
-
-app.get("/failure", (req, res) => {
-  res.send("Login failed. <a href='/'>Try again</a>");
-});
-
-app.get("/logout", (req, res, next) => {
-  req.logout(err => {
-    if (err) return next(err);
-    res.redirect("/");
+  res.status(200).json({
+    message: "Login successful",
+    token
   });
 });
 
-app.listen(3000, () => console.log("http://localhost:3000"));
+// JWT authentication middleware
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(403).json({
+      message: "Invalid token"
+    });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({
+        message: "Invalid token"
+      });
+    }
+
+    req.user = user;
+    next();
+  });
+}
+
+// Protected movies API
+app.get("/movies", authenticateToken, (req, res) => {
+  res.status(200).json(movies);
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
