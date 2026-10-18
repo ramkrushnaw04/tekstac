@@ -15,7 +15,7 @@ const movies = [
   { id: 3, title: "Inception" }
 ];
 
-// Login API
+// Login route
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
@@ -37,30 +37,42 @@ app.post("/login", (req, res) => {
   });
 });
 
-// JWT authentication middleware
+// Middleware to authenticate JWT
 function authenticateToken(req, res, next) {
   const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(" ")[1];
 
-  if (!token) {
-    return res.status(403).json({
-      message: "Invalid token"
+  // Missing Authorization header
+  if (!authHeader) {
+    return res.status(401).json({
+      message: "Access denied. Token missing"
     });
   }
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
+  // Missing or malformed Bearer token
+  const parts = authHeader.split(" ");
+
+  if (parts.length !== 2 || parts[0] !== "Bearer" || !parts[1]) {
+    return res.status(401).json({
+      message: "Access denied. Token missing or malformed"
+    });
+  }
+
+  const token = parts[1];
+
+  // Verify token
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
       return res.status(403).json({
-        message: "Invalid token"
+        message: "Invalid or expired token"
       });
     }
 
-    req.user = user;
+    req.user = decoded;
     next();
   });
 }
 
-// Protected movies API
+// Protected movies route
 app.get("/movies", authenticateToken, (req, res) => {
   res.status(200).json(movies);
 });
